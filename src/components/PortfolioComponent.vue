@@ -1,40 +1,59 @@
 <template>
   <div class="PortfolioComponent">
+    <div class="PortfolioInfo" v-if="renders > 1">
+      <h1 class="PortfolioTitle">Портфель</h1>
+      <h2 class="TotalPortfolio" v-if="totalValue !== ''">
+        Оценка портфеля в долларах: {{ totalValue }}
+      </h2>
+      <h3 class="USDAmount">
+        <img class="CurrencyImage" src="../assets/usa.png" alt="" /> USD: {{ usdValue }}$
+      </h3>
+      <h3 class="BTCAmount">
+        <img class="CurrencyImage" src="../assets/bitcoin.png" alt="" /> BTC: {{ btcAmount }} (
+        {{ btcValue }} $)
+      </h3>
+      <h3 class="ETHAmount">
+        <img class="CurrencyImage" src="../assets/ethereum.png" alt="" /> ETH: {{ ethAmount }} (
+        {{ ethValue }} $)
+      </h3>
+      <div class="ChangeAmount">
+        <label for="btcChangeInput">Прибавить/отнять BTC: </label>
+        <input
+          class="ChangeAmountInput"
+          type="number"
+          name="btcChangeInput"
+          id="btcChangeInput"
+          v-model.number="btcChange"
+        />
+        <button class="AddButton" @click="btcAmount += btcChange">+</button>
+        <button class="SubstractButton" @click="btcAmount -= btcChange">
+          -
+        </button>
+      </div>
+      <div class="ChangeAmount">
+        <label for="ethChangeInput">Прибавить/отнять ETH: </label>
+        <input
+          class="ChangeAmountInput"
+          type="number"
+          name="ethChangeInput"
+          id="ethChangeInput"
+          v-model.number="ethChange"
+        />
+        <button class="AddButton" @click="ethAmount += ethChange">+</button>
+        <button class="SubstractButton" @click="ethAmount -= ethChange">
+          -
+        </button>
+      </div>
+    </div>
     <PieChart
-      v-if="renders > 1" :key="renders"
+      class="USDValueChart"
+      v-if="renders > 1"
+      :key="renders"
       :chartData="res"
       :options="chartOptions"
       :chartColors="backgroundColors"
     />
-    <div class="" v-else>Loading...</div>
-    <div class="totalPortfolio" v-if="totalValue !== ''">
-      Оценка портфеля в долларах: {{ totalValue }}
-    </div>
-    <div class="usdAmount">USD: {{ usdValue }}$</div>
-    <div class="btcAmount">BTC: {{ btcAmount }} ( {{ btcValue }} $)</div>
-    <div class="ethAmount">ETH: {{ ethAmount }} ( {{ ethValue }} $)</div>
-    <div class="btcChange">
-      <label for="btcChangeInput">Change BTC amount</label>
-      <input
-        type="number"
-        name="btcChangeInput"
-        id="btcChangeInput"
-        v-model.number="btcChange"
-      />
-      <button @click="btcAmount += btcChange">+</button>
-      <button @click="btcAmount -= btcChange">-</button>
-    </div>
-    <div class="ethChange">
-      <label for="ethChangeInput">Change ETH amount</label>
-      <input
-        type="number"
-        name="ethChangeInput"
-        id="ethChangeInput"
-        v-model.number="ethChange"
-      />
-      <button @click="ethAmount += ethChange">+</button>
-      <button @click="ethAmount -= ethChange">-</button>
-    </div>
+    <div class="" v-else>Загрузка...</div>
   </div>
 </template>
 
@@ -51,7 +70,7 @@ export default {
     return {
       res: [],
       totalValue: "",
-      renders: 0,//ключ для графика, изменение которого вызывает ререндер
+      renders: 0, //ключ для графика, изменение которого вызывает ререндер
       usdValue: "",
       btcValue: "",
       btcAmount: "",
@@ -77,10 +96,10 @@ export default {
     this.ethAmount = portfolio.ETH;
     this.ethValue = this.ethAmount * this.exchangeRate;
     this.res = [
-        ["USD", this.usdValue],
-        ["BTC", this.btcValue],
-        ["ETH", this.ethValue],
-      ];
+      ["USD", this.usdValue],
+      ["BTC", this.btcValue],
+      ["ETH", this.ethValue],
+    ];
     this.totalValue = this.usdValue + this.btcValue + this.ethValue + "$";
   },
   methods: {
@@ -107,7 +126,7 @@ export default {
       }
     },
     async btcAmount(newValue) {
-      this.$store.dispatch('setBTCAmount_action', newValue);
+      this.$store.dispatch("setBTCAmount_action", newValue);
       await this.getExchangeRate("bitcoin", "usd");
       this.btcValue = newValue * this.exchangeRate;
       this.res = [];
@@ -119,7 +138,7 @@ export default {
       this.renders++;
     },
     async ethAmount(newValue) {
-      this.$store.dispatch('setETHAmount_action', newValue);
+      this.$store.dispatch("setETHAmount_action", newValue);
       await this.getExchangeRate("ethereum", "usd");
       this.ethValue = newValue * this.exchangeRate;
       this.res = [];
@@ -135,4 +154,93 @@ export default {
 </script>
 
 <style scoped>
+.PortfolioComponent {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.PortfolioInfo {
+  border: 1px solid black;
+  border-radius: 10px;
+
+  padding: 2%;
+}
+
+.PortfolioTitle {
+  width: 100%;
+  padding: 2%;
+  border-bottom: 1px solid black;
+}
+
+.USDAmount,
+.BTCAmount,
+.ETHAmount {
+  height: 32px;
+  text-align: center;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.CurrencyImage{
+  margin-right: 1%;
+}
+
+.ChangeAmountInput,
+.AddButton,
+.SubstractButton {
+  background: none;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin: 0.5%;
+}
+
+.USDValueChart {
+  position: relative;
+  width: 40%;
+}
+
+@media screen and (max-width: 550px) {
+  .PortfolioComponent{
+    flex-direction: column;
+  }
+
+.PortfolioInfo {
+  padding: 0%;
+  margin-bottom: 2%;
+}
+
+.USDAmount,
+.BTCAmount,
+.ETHAmount {
+  height: 12px;
+}
+
+.ChangeAmount{
+  margin-bottom: 2%;
+}
+
+  .ChangeAmountInput,
+.AddButton,
+.SubstractButton {
+  background: none;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin: 0%;
+}
+
+.ChangeAmountInput{
+  width: 30%;
+}
+
+.USDValueChart {
+  width: 75%;
+}
+
+}
 </style>

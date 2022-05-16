@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <nav>
-      <router-link to="/">Converter</router-link> |
-      <router-link to="/portfolio">Portfolio</router-link>
+      <router-link to="/">Конвертер</router-link> |
+      <router-link to="/portfolio">Портфель</router-link>
     </nav>
     <router-view/>
   </div>
@@ -21,6 +21,12 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 nav {

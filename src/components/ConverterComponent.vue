@@ -1,34 +1,46 @@
 <template>
   <div class="ConverterComponent">
-    <div class="ConvertionParamsSelector">
-      <label for="convertedFromSelector">From</label>
-      <select
-        name="convertedFrom"
-        id="convertedFromSelector"
-        @change="convertedFrom = $event.target.value"
-        :value="convertedFrom"
-      >
-        <option value="BTC">Bitcoin</option>
-        <option value="ETH">Ether</option>
-        <option value="USD">US Dollar</option>
-      </select>
-      <label for="convertedToSelector">To</label>
-      <select
-        name="convertedTo"
-        id="convertedToSelector"
-        @change="convertedTo = $event.target.value"
-        :value="convertedTo"
-      >
-        <option value="BTC">Bitcoin</option>
-        <option value="ETH">Ether</option>
-        <option value="USD">US Dollar</option>
-      </select>
+    <div class="CurrencyConverter" v-if="res.length > 0">
+      <div class="CurrencyConverterSelect" v-if="res.length > 0">
+        <div class="ConvertedFrom">
+          <input
+            type="number"
+            class="ConvertedFromInput"
+            v-model.number="convertedAmount"
+          />
+          <select
+            name="convertedFrom"
+            id="convertedFromSelector"
+            class="ConvertionSelector"
+            @change="convertedFrom = $event.target.value"
+            :value="convertedFrom"
+          >
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ether (ETH)</option>
+            <option value="USD">US Dollar (USD)</option>
+          </select>
+        </div>
+        <p>=</p>
+        <div class="ConvertedTo">
+          <label class="ConvertedToLabel" for="convertedToSelector">{{
+            convertionResult
+          }}</label>
+          <select
+            name="convertedTo"
+            id="convertedToSelector"
+            class="ConvertionSelector"
+            @change="convertedTo = $event.target.value"
+            :value="convertedTo"
+          >
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ether (ETH)</option>
+            <option value="USD">US Dollar (USD)</option>
+          </select>
+        </div>
+      </div>
+      <button class="ConvertButton" @click="convert()">Конвертировать</button>
     </div>
-    <div class="ConvertBlock" v-if="exchangeRate !== ''">
-      <input type="number" v-model.number="convertedAmount" />
-      {{ convertedFrom }} = {{ convertionResult }} {{ convertedTo }}
-      <button class="ConvertButton" @click="convert()">Convert</button>
-    </div>
+
     <!-- для того, чтобы настроить размеры графика, необходимо прописать position:relative -->
     <LineChart
       class="MarketRateChart"
@@ -38,7 +50,7 @@
       :chartColors="colors"
       :label="label"
     />
-    <div class="loader" v-else>Loading...</div>
+    <div class="loader" v-else>Загрузка...</div>
   </div>
 </template>
 
@@ -114,16 +126,18 @@ export default {
         });
     },
     convert() {
-      if(this.portfolio[this.convertedFrom] < this.convertedAmount){
+      if (this.portfolio[this.convertedFrom] < this.convertedAmount) {
         /*минимальное значение convertedAmount - 1, 
         но у пользователя может не быть данной валюты вовсе */
-        alert('Ошибка: недостаточно валюты');
-        return;
+        alert("Ошибка: недостаточно валюты");
+      } else {
+        this.portfolio[this.convertedFrom] -= this.convertedAmount;
+        this.portfolio[this.convertedTo] += this.convertionResult;
+        this.$store.dispatch("setPortfolio_action", this.portfolio);
+        this.convertedAmount = 1;
+        this.convertionResult = this.convertedAmount * this.exchangeRate;
       }
-      this.portfolio[this.convertedFrom] -= this.convertedAmount;
-      this.portfolio[this.convertedTo] += this.convertionResult;
-      this.$store.dispatch('setPortfolio_action', this.portfolio);
-      this.convertedAmount = 1;
+      this.$router.push("/portfolio");
     },
   },
   watch: {
@@ -208,18 +222,104 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.ConverterComponent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+.CurrencyConverter {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 2%;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+
+.CurrencyConverterSelect {
+  min-width: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 1%;
 }
-a {
-  color: #42b983;
+
+.ConvertedFrom,
+.ConvertedTo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 5px;
+  margin: 1%;
+}
+
+.ConvertedFromInput {
+  width: 40%;
+}
+
+.ConvertedToLabel {
+  width: 50%;
+  min-width: fit-content;
+  margin-right: 2%;
+}
+
+.ConvertionSelector {
+  width: 10%;
+  min-width: fit-content;
+  height: 30px;
+  background: none;
+  border: none;
+  border-left: 1px solid black;
+
+  cursor: pointer;
+}
+
+.ConvertButton {
+  min-width: fit-content;
+  background: none;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 0.5%;
+
+  cursor: pointer;
+}
+
+.MarketRateChart {
+  position: relative;
+
+  width: 100%;
+}
+
+@media screen and (max-width: 550px) {
+  .CurrencyConverter {
+    flex-direction: column;
+
+    margin-bottom: 5%;
+  }
+
+  .CurrencyConverterSelect {
+    flex-direction: column;
+    margin-right: 0;
+    margin-bottom: 5%;
+  }
+
+  .ConvertButton{
+    padding: 3%;
+  }
+
+  .MarketRateChart {
+    position: relative;
+    width: 100vw;
+  }
 }
 </style>

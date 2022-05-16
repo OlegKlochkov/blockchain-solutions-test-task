@@ -15,3 +15,15 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.PortfolioView{
+  width: 80%;
+}
+
+@media screen and (max-width: 550px) {
+  .PortfolioView{
+    width: 100%;
+  }
+}
+</style>
