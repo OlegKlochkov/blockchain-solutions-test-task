@@ -1,5 +1,9 @@
 # blockchain-solutions-test-task
 
+Тестовое задание на позицию Frontend Developer(Стажировка) в Blockchain Solutions
+
+https://bs-test-task.netlify.app/#/
+
 ## Project setup
 ```
 npm install
