@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="ConverterComponent">
     <div>
       <label for="convertedFromSelector">From</label>
       <select
@@ -107,7 +107,7 @@ export default {
         })
     },
     convert(amount){
-      amount = amount > 0 ? amount : 1;
+      if (amount < 0){return;}
       this.convertedAmount = amount;
       this.convertionResult = this.convertedAmount*this.exchangeRate;
     }
@@ -120,12 +120,13 @@ export default {
         this.exchangeRate = this.convertedAmount/this.exchangeRate;
         this.convertionResult = this.convertedAmount*this.exchangeRate;
       } else {
-        this.label = `${this.convertedFrom} to ${this.convertedTo}`;
         if (newValue !== "USD") {
+          this.label = `${this.convertedFrom} to ${this.convertedTo}`;
           this.getMarketChart(this.coinsCurrencies[newValue].from, this.coinsCurrencies[this.convertedTo].to);
           await this.getExchangeRate(this.coinsCurrencies[newValue].from, this.coinsCurrencies[this.convertedTo].to);
           this.convertionResult = this.convertedAmount*this.exchangeRate;
         } else {
+          this.label = `${this.convertedTo} to ${this.convertedFrom}`;
           this.getMarketChart(this.coinsCurrencies[this.convertedTo].from, this.coinsCurrencies[newValue].to);
           await this.getExchangeRate(this.coinsCurrencies[this.convertedTo].from, this.coinsCurrencies[newValue].to);
           this.exchangeRate = this.convertedAmount/this.exchangeRate;
@@ -138,19 +139,25 @@ export default {
         //меняет местами валюты
         this.convertedFrom = oldValue;//обновляет convertedFrom, тем самым запуская его watcher, обновляющий курс
       } else {
-        this.label = `${this.convertedFrom} to ${this.convertedTo}`;
         if (this.convertedFrom !== "USD") {//если конвертируем не из долларов
+          this.label = `${this.convertedFrom} to ${this.convertedTo}`;
           this.getMarketChart(this.coinsCurrencies[this.convertedFrom].from, this.coinsCurrencies[newValue].to);
           await this.getExchangeRate(this.coinsCurrencies[this.convertedFrom].from, this.coinsCurrencies[newValue].to);
           this.convertionResult = this.convertedAmount*this.exchangeRate;
         } else {
+          this.label = `${this.convertedTo} to ${this.convertedFrom}`;
           this.getMarketChart(this.coinsCurrencies[newValue].from, this.coinsCurrencies[this.convertedFrom].to);
           await this.getExchangeRate(this.coinsCurrencies[newValue].from, this.coinsCurrencies[this.convertedFrom].to);
           this.exchangeRate = this.convertedAmount/this.exchangeRate;
           this.convertionResult = this.convertedAmount*this.exchangeRate;
         }
       }
-    }
+    },
+    convertedAmount(newValue, oldValue){
+          if(newValue < 0){
+              this.convertedAmount = oldValue;
+          }
+      }
   },
 };
 </script>
