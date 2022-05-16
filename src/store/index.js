@@ -17,6 +17,11 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setPortfolio(state, payload){
+      state.portfolio.USD = payload.USD;
+      state.portfolio.BTC = payload.BTC;
+      state.portfolio.ETH = payload.ETH;
+    },
     setBTCAmount(state, payload){
       state.portfolio.BTC = payload;
     },
@@ -25,6 +30,9 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    setPortfolio_action({commit}, payload){
+      commit('setPortfolio', payload);
+    },
     setBTCAmount_action({commit}, payload){
       commit('setBTCAmount', payload);
     },

@@ -20,8 +20,6 @@ export default {
   mounted() {
     const chartLabels = this.chartData.map(entry => entry[0]);
     const amounts = this.chartData.map(entry => entry[1]);
-    console.log(chartLabels);
-    console.log(amounts);
     const backgroundColors = this.chartColors;
 
     this.renderChart(

@@ -20,8 +20,6 @@ export default {
   mounted() {
     const dates = this.chartData.map(entry => entry[0]);
     const totals = this.chartData.map(entry => entry[1]);
-    console.log(dates);
-    console.log(totals)
     const {
       borderColor,
       pointBorderColor,
